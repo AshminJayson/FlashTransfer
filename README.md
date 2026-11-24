@@ -2,13 +2,40 @@
 
 Copy files between a Mac and an Android phone over USB.
 
-## Requirements
+Website: https://ashminjayson.github.io/FlashTransfer/
 
-- macOS
-- To build: Go 1.26+, Node.js, `brew install libusb pkgconf`,
-  and the Wails CLI: `go install github.com/wailsapp/wails/v3/cmd/wails3@v3.1.0`
+## Installation
 
-## Build
+You need a Mac with macOS 13 or later (Apple Silicon or Intel), an Android phone, and a USB
+cable that carries data (some cables only charge).
+
+1. Download **FlashTransfer.dmg** from the
+   [latest release](https://github.com/AshminJayson/FlashTransfer/releases/latest).
+2. Open the downloaded file and drag **FlashTransfer** into **Applications**.
+3. Open **FlashTransfer** from Applications.
+4. The first time, macOS says it can't verify the app, because it is not yet signed with an
+   Apple developer certificate. Click **Done**, open **System Settings > Privacy & Security**,
+   scroll down and click **Open Anyway** next to FlashTransfer, then confirm. This is only
+   needed once.
+
+### Connect your phone
+
+1. Plug the phone into the Mac and unlock it.
+2. On the phone, open the **USB** notification and choose **File transfer**. If you don't see
+   these options, unplug the cable and plug it back in.
+3. If FlashTransfer says **macOS Image Capture is using the phone**, click
+   **Stop Image Capture and Connect**. FlashTransfer gives the phone back to Photos and Image
+   Capture when you disconnect.
+4. If the phone asks **Allow access to phone data?**, tap **Allow**.
+
+Copy with **Copy to Mac** and **Copy to Phone**, or drag files from Finder onto the window.
+Click **Disconnect** before unplugging. If something goes wrong, the screen says what and how
+to fix it; the codes are explained under [Troubleshooting](#troubleshooting).
+
+## Building from source
+
+Requires macOS, Go 1.26+, Node.js, `brew install libusb pkgconf`, and the Wails CLI:
+`go install github.com/wailsapp/wails/v3/cmd/wails3@v3.1.0`.
 
 ```
 wails3 task dmg                               # release: universal bin/FlashTransfer.dmg
@@ -30,7 +57,7 @@ The desktop app has the same features as the command line below: browse, copy bo
 `docs/` is the user-facing site. To publish it: repository Settings > Pages > Deploy from a branch,
 branch `main`, folder `/docs`. Its download and help links point to this repository automatically.
 
-## Usage
+## Command-line tool
 
 Plug the phone in, unlock it, and choose **File transfer** from the USB notification.
 
