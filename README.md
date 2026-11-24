@@ -2,8 +2,6 @@
 
 Copy files between a Mac and an Android phone over USB.
 
-Website: https://ashminjayson.github.io/FlashTransfer/
-
 ## Installation
 
 You need a Mac with macOS 13 or later (Apple Silicon or Intel), an Android phone, and a USB
