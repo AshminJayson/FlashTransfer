@@ -190,7 +190,7 @@ func openOnce(holdOff, debug bool, status Status) (p *Phone, retry bool, err err
 		// first seconds are normal after a reset; only then ask the user
 		if !waiting && time.Since(start) > 2*time.Second {
 			waiting = true
-			status(StepFiles, "Waiting for you to unlock the phone. If it asks \"Allow access to phone data?\", tap Allow.")
+			status(StepFiles, "Waiting for the phone to share its files: unlock it, set its USB mode to File transfer (not Charging only), and tap Allow if asked.")
 		}
 	}
 	if err != nil {

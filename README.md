@@ -111,8 +111,11 @@ at a time. Quit the app named in the message (for example OpenMTP or Android Fil
 
 ### MTP-005
 
-**Phone storage is not visible.** Android hides files until the phone is unlocked and access
-is allowed. Unlock the phone and tap **Allow** if it asks "Allow access to phone data?".
+**Phone isn't sharing its files.** Android shares no files while the phone is locked, until
+you allow access, or while its USB mode is **Charging only**; over USB these look the same.
+Unlock the phone, choose **File transfer** in its USB notification, and tap **Allow** if it
+asks "Allow access to phone data?". Switching the mode while FlashTransfer waits is fine: it
+reconnects by itself.
 
 ### MTP-006
 

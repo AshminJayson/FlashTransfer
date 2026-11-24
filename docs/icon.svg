@@ -1,12 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#1c1c1e"/>
-      <stop offset="1" stop-color="#000000"/>
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#eef0f3"/>
     </linearGradient>
   </defs>
-  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#bg)"/>
+  <!-- macOS icon grid: 824px rounded square centered on a 1024 canvas; faint edge so it reads on light backgrounds -->
+  <rect x="100" y="100" width="824" height="824" rx="185" fill="url(#bg)" stroke="#d4d8de" stroke-width="6"/>
   <g transform="translate(512 512) scale(5.6) translate(-50 -50)">
-    <path d="M60 4 L18 58 L45 58 L37 96 L82 38 L55 38 Z" fill="#ffffff" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M60 4 L18 58 L45 58 L37 96 L82 38 L55 38 Z" fill="#000000" stroke="#000000" stroke-width="3" stroke-linejoin="round"/>
   </g>
 </svg>

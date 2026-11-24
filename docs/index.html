@@ -3,162 +3,439 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>FlashTransfer: copy files between your Mac and Android phone</title>
+    <title>FlashTransfer: copy files between your Mac and your Android phone</title>
+    <meta name="description" content="Free, open-source Mac app to copy photos, videos and files between your Mac and an Android phone over USB. It shows every step of the connection and tells you what to do when something blocks it."/>
     <link rel="icon" type="image/svg+xml" href="icon.svg"/>
-    <meta name="description" content="Free, open-source Mac app to copy photos, videos and files between your Mac and an Android phone over USB."/>
+    <script>
+        // apply a saved dark-mode choice before the page paints
+        try { if (localStorage.getItem("theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch (e) {}
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap"/>
     <style>
         :root {
-            --bg: #ffffff; --bg-soft: #f5f5f7; --fg: #1d1d1f; --dim: #6e6e73; --line: #e5e5ea;
-            --accent: #0a84ff; --warn-bg: #fff8e6; --warn-line: #f5d78e;
-            color-scheme: light dark;
+            --black: #000000;
+            --paper: #ffffff;
+            --surface: #f4f5f7;
+            --ink: #000000;
+            --muted: #555d6b;
+            --line: #e1e4ea;
+            --ready: #1f8a4c;
+            --blocked: #c46a00;
+            --blocked-bg: #fff4e0;
+            --working: #1d5fd6;
+            --button-bg: #000000;
+            --button-fg: #ffffff;
+            --display: "Bricolage Grotesque", "Avenir Next Condensed", "Helvetica Neue", sans-serif;
+            --text: "Atkinson Hyperlegible", -apple-system, "Helvetica Neue", Arial, sans-serif;
+            color-scheme: light;
         }
-        @media (prefers-color-scheme: dark) {
-            :root { --bg: #1c1c1e; --bg-soft: #2a2a2c; --fg: #f5f5f7; --dim: #98989d; --line: #3a3a3c; --warn-bg: #3a3120; --warn-line: #6b5520; }
+        /* dark mode is opt-in from the header toggle */
+        html[data-theme="dark"] {
+            --paper: #000000;
+            --surface: #15181d;
+            --ink: #ffffff;
+            --muted: #a3abb8;
+            --line: #2a2f37;
+            --ready: #3cc27a;
+            --blocked: #f0a53a;
+            --blocked-bg: #2b2213;
+            --working: #7aa7ff;
+            --button-bg: #ffffff;
+            --button-fg: #000000;
+            color-scheme: dark;
         }
+
         * { box-sizing: border-box; }
-        body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
-        main { max-width: 760px; margin: 0 auto; padding: 0 22px 60px; }
-        header.hero { text-align: center; padding: 64px 0 36px; }
-        .app-icon { width: 112px; height: 112px; }
-        h1 { font-size: 44px; line-height: 1.1; margin: 12px 0 10px; letter-spacing: -0.02em; }
-        .tagline { font-size: 20px; color: var(--dim); margin: 0 0 28px; }
-        .download { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; padding: 12px 26px; border-radius: 10px; font-size: 17px; }
-        .download:hover { filter: brightness(1.08); }
-        .meta { color: var(--dim); font-size: 14px; margin-top: 12px; }
-        h2 { font-size: 26px; margin: 52px 0 12px; letter-spacing: -0.01em; }
-        h3 { font-size: 18px; margin: 24px 0 6px; }
-        a { color: var(--accent); }
-        ol, ul { padding-left: 22px; }
-        li { margin: 6px 0; }
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: 18px; }
-        .feature { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
-        .feature b { display: block; margin-bottom: 4px; }
-        .feature p { margin: 0; color: var(--dim); font-size: 15px; }
-        .shots { display: grid; gap: 22px; margin-top: 36px; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            margin: 0; background: var(--paper); color: var(--ink);
+            font: 18px/1.6 var(--text);
+        }
+        a { color: var(--working); text-underline-offset: 3px; }
+        a:focus-visible, summary:focus-visible, .download:focus-visible {
+            outline: 3px solid var(--working); outline-offset: 3px; border-radius: 6px;
+        }
+        b, strong { font-weight: 700; }
+        .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+        .col > * { max-width: 680px; }
+
+        /* --- hero --- */
+        .hero {
+            display: grid; grid-template-columns: 1.05fr 1fr; gap: 56px; align-items: center;
+            padding: 28px 0 88px;
+        }
+        .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; grid-column: 1 / -1; }
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .theme {
+            display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+            font: 15px/1 var(--text); color: var(--ink); background: transparent;
+            border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px;
+        }
+        .theme:hover { background: var(--surface); }
+        .theme:focus-visible { outline: 3px solid var(--working); outline-offset: 3px; }
+        .theme svg { width: 16px; height: 16px; }
+        .brand img { width: 56px; height: 56px; }
+        .brand span { font: 700 22px/1 var(--display); font-stretch: 90%; letter-spacing: -0.01em; }
+        h1 {
+            font-family: var(--display); font-weight: 800; font-stretch: 75%;
+            font-size: clamp(48px, 7vw, 92px); line-height: 0.92; letter-spacing: -0.025em;
+            margin: 0 0 24px;
+        }
+        .lede { font-size: 21px; line-height: 1.5; color: var(--muted); max-width: 30em; margin: 0 0 32px; }
+        .download {
+            display: inline-flex; align-items: center; gap: 12px;
+            background: var(--button-bg); color: var(--button-fg); text-decoration: none;
+            font: 700 19px/1 var(--text); padding: 18px 26px; border-radius: 14px;
+        }
+        .download svg { width: 18px; height: 18px; }
+        .download:hover { opacity: 0.85; }
+        .fine { color: var(--muted); font-size: 15px; margin: 14px 0 0; }
+
+        /* the live connection: the one moving thing on the page */
+        .live {
+            background: var(--black); color: #fff; border-radius: 28px; padding: 34px 34px 30px;
+            box-shadow: 0 30px 60px -30px rgba(15, 26, 42, 0.55);
+        }
+        html[data-theme="dark"] .live { border: 1px solid #2a2f37; box-shadow: none; }
+        .live-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 26px; }
+        .live-head b { font: 700 20px/1.2 var(--display); font-stretch: 85%; }
+        .live-head span { color: #9aa3b0; font-size: 14px; }
+        .steps { list-style: none; margin: 0; padding: 0; }
+        .steps li { display: grid; grid-template-columns: 30px 1fr; gap: 16px; position: relative; padding-bottom: 22px; }
+        .steps li:last-child { padding-bottom: 0; }
+        .steps li:not(:last-child)::before {
+            content: ""; position: absolute; left: 14px; top: 32px; bottom: 4px; width: 2px; background: #2c3440;
+            transition: background 0.4s;
+        }
+        .dot {
+            width: 30px; height: 30px; border-radius: 50%; border: 2px solid #3a4350;
+            display: grid; place-items: center; font: 700 14px/1 var(--text); color: #7d8796;
+            transition: background 0.3s, border-color 0.3s;
+        }
+        .step-title { font-weight: 700; margin-top: 3px; }
+        .step-note { color: #9aa3b0; font-size: 15px; min-height: 1.6em; }
+        .steps li.working .dot { border-color: #2c3440; border-top-color: #6d9cff; animation: spin 0.8s linear infinite; font-size: 0; }
+        .steps li.blocked .dot { background: #f0a53a; border-color: #f0a53a; color: #000; }
+        .steps li.blocked .step-note { color: #f6c27a; }
+        .steps li.done .dot { background: #3cc27a; border-color: #3cc27a; font-size: 0; }
+        .steps li.done .dot::after {
+            content: ""; width: 7px; height: 12px; border: solid #000; border-width: 0 2.5px 2.5px 0;
+            transform: translateY(-1px) rotate(45deg);
+        }
+        .steps li.done:not(:last-child)::before { background: #3cc27a; }
+        .live-foot { margin-top: 26px; padding-top: 18px; border-top: 1px solid #2c3440; color: #9aa3b0; font-size: 15px; }
+        .live-foot b { color: #3cc27a; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- sections --- */
+        section { padding: 64px 0; border-top: 1px solid var(--line); }
+        h2 {
+            font-family: var(--display); font-weight: 800; font-stretch: 80%;
+            font-size: clamp(34px, 4.4vw, 48px); line-height: 1; letter-spacing: -0.02em; margin: 0 0 18px;
+        }
+        h3 { font: 700 21px/1.3 var(--text); margin: 34px 0 8px; }
+        p { margin: 0 0 16px; }
+        .intro { color: var(--muted); font-size: 20px; margin-bottom: 28px; }
+
+        .does { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 26px 48px; max-width: 920px; }
+        .does b { display: block; font: 700 21px/1.25 var(--display); font-stretch: 88%; margin-bottom: 4px; }
+        .does span { color: var(--muted); }
+
+        .shots { display: grid; gap: 28px; margin-top: 8px; }
         .shots figure { margin: 0; }
-        .shots img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18); }
-        .shots figcaption { color: var(--dim); font-size: 14px; text-align: center; margin-top: 8px; }
-        .note { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 12px; padding: 14px 18px; margin: 16px 0; }
-        code { font: 14px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; }
-        details { border-bottom: 1px solid var(--line); padding: 10px 0; }
-        summary { cursor: pointer; font-weight: 600; }
-        summary .code { color: var(--dim); font-weight: normal; font: 14px ui-monospace, SFMono-Regular, Menlo, monospace; margin-right: 8px; }
-        details p { margin: 8px 0 4px; }
-        footer { color: var(--dim); font-size: 14px; text-align: center; border-top: 1px solid var(--line); padding: 24px 22px 40px; }
+        .shots img { width: 100%; height: auto; display: block; border-radius: 14px; border: 1px solid var(--line); }
+        .shots figcaption { color: var(--muted); font-size: 16px; margin-top: 10px; }
+
+        ol.seq { counter-reset: n; list-style: none; padding: 0; margin: 0 0 8px; }
+        ol.seq > li { counter-increment: n; position: relative; padding-left: 52px; margin: 0 0 18px; }
+        ol.seq > li::before {
+            content: counter(n); position: absolute; left: 0; top: -2px;
+            width: 34px; height: 34px; border-radius: 50%; background: var(--surface); border: 2px solid var(--line);
+            display: grid; place-items: center; font: 700 16px/1 var(--display);
+        }
+        .caution {
+            background: var(--blocked-bg); border-left: 5px solid var(--blocked); border-radius: 4px 14px 14px 4px;
+            padding: 18px 22px; margin: 26px 0 0;
+        }
+        .caution b:first-child { display: block; margin-bottom: 4px; }
+
+        /* connection stages, drawn like the app */
+        ol.stages > li::before { border-color: var(--ready); color: var(--ready); }
+        .stage-note { color: var(--muted); font-size: 16px; }
+
+        .ways { padding-left: 22px; margin: 0; }
+        .ways li { margin: 0 0 10px; }
+
+        /* troubleshooting, grouped by the stage each problem blocks */
+        .group { margin-top: 30px; }
+        .group h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; font-size: 18px; color: var(--muted); }
+        .group h3 i { width: 12px; height: 12px; border-radius: 50%; background: var(--blocked); flex: none; }
+        .group.after h3 i { background: var(--working); }
+        details { border-bottom: 1px solid var(--line); }
+        summary {
+            list-style: none; cursor: pointer; padding: 14px 0; display: grid; grid-template-columns: 92px 1fr 20px; gap: 12px; align-items: baseline;
+        }
+        summary::-webkit-details-marker { display: none; }
+        summary .code { color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
+        summary .what { font-weight: 700; }
+        summary::after { content: "+"; color: var(--muted); font-size: 22px; line-height: 1; text-align: right; }
+        details[open] summary::after { content: "\2212"; }
+        details p { margin: 0 0 16px 104px; color: var(--ink); }
+
+        footer { border-top: 1px solid var(--line); padding: 34px 0 56px; color: var(--muted); font-size: 16px; }
+
+        @media (max-width: 860px) {
+            .hero { grid-template-columns: 1fr; gap: 44px; padding: 20px 0 64px; }
+            .topbar { margin-bottom: 8px; }
+            .does { grid-template-columns: 1fr; }
+            summary { grid-template-columns: 78px 1fr 20px; }
+            details p { margin-left: 0; }
+            .live { padding: 26px 22px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .steps li.working .dot { animation: none; }
+            .steps li::before, .dot { transition: none; }
+        }
     </style>
 </head>
 <body>
-<main>
+
+<div class="wrap">
     <header class="hero">
-        <img class="app-icon" src="icon.svg" width="112" height="112" alt="FlashTransfer icon"/>
-        <h1>FlashTransfer</h1>
-        <p class="tagline">Copy photos, videos and files between your Mac and your Android phone. Just a USB cable, no accounts, no internet.</p>
-        <a class="download" data-gh="releases" href="#install">Download for Mac</a>
-        <p class="meta">Free and open source &middot; macOS 13 or later &middot; Apple Silicon and Intel</p>
+        <div class="topbar">
+            <div class="brand"><img src="icon.svg" width="56" height="56" alt=""/><span>FlashTransfer</span></div>
+            <button class="theme" id="theme" type="button" aria-pressed="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+                <span>Dark mode</span>
+            </button>
+        </div>
+        <div>
+            <h1>Copy files between your Mac and your Android phone.</h1>
+            <p class="lede">Plug in a USB cable and FlashTransfer shows every step of the connection. If something gets in the way, it tells you what it is and how to fix it.</p>
+            <a class="download" href="https://github.com/AshminJayson/FlashTransfer/releases/latest/download/FlashTransfer.dmg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="M6 11l6 6 6-6"/><path d="M4 21h16"/></svg>
+                Download for Mac
+            </a>
+            <p class="fine">Free and open source. Needs macOS 13 or later, on Apple Silicon or Intel.</p>
+        </div>
+
+        <!-- replays the app's connection flow once on load -->
+        <div class="live" aria-label="How FlashTransfer connects to your phone">
+            <div class="live-head"><b>Connecting to your phone</b><span id="clock">0 s</span></div>
+            <ol class="steps" id="demo">
+                <li data-note="Found over USB, in File transfer mode"><span class="dot">1</span><div><div class="step-title">Phone plugged in</div><div class="step-note"></div></div></li>
+                <li data-note="Image Capture paused with your OK"><span class="dot">2</span><div><div class="step-title">Phone free for FlashTransfer</div><div class="step-note"></div></div></li>
+                <li data-note="Talking to the phone"><span class="dot">3</span><div><div class="step-title">Connection opened</div><div class="step-note"></div></div></li>
+                <li data-note="Internal storage, 49 GB free"><span class="dot">4</span><div><div class="step-title">Phone sharing its files</div><div class="step-note"></div></div></li>
+            </ol>
+            <div class="live-foot" id="demo-foot">Waiting for a phone</div>
+        </div>
     </header>
+</div>
 
-    <section class="features" aria-label="Features">
-        <div class="feature"><b>Both directions</b><p>Copy from the phone to the Mac and from the Mac to the phone. Drag files straight from Finder.</p></div>
-        <div class="feature"><b>Nothing overwritten by accident</b><p>Existing files are skipped unless you choose to replace them, and a replaced file is only removed once the new copy has arrived.</p></div>
-        <div class="feature"><b>Clear progress</b><p>See each file, the percentage, and roughly how long the copy has left. File details show an estimate before you start.</p></div>
-        <div class="feature"><b>Tells you what's wrong</b><p>Every problem comes with a plain explanation, steps to fix it, and a log you can copy when asking for help.</p></div>
-    </section>
-
-    <section class="shots" aria-label="Screenshots">
-        <!-- a missing screenshot removes itself instead of showing a broken image -->
-        <figure><img src="screenshots/connect.png" alt="FlashTransfer showing each connection step, with macOS Image Capture blocking step 2" loading="lazy" onerror="this.closest('figure').remove()"/>
-            <figcaption>Every connection step is visible, and a blocked step says why and what to do.</figcaption></figure>
-        <figure><img src="screenshots/browse.png" alt="FlashTransfer browsing the phone's files with the details panel open" loading="lazy" onerror="this.closest('figure').remove()"/>
-            <figcaption>Browse the phone, copy either way, and see how long a copy will take.</figcaption></figure>
-    </section>
-
-    <h2 id="install">Install</h2>
-    <ol>
-        <li>Download the latest <b>FlashTransfer.dmg</b> from the <a data-gh="releases" href="#">releases page</a>.</li>
-        <li>Open it and drag <b>FlashTransfer</b> into <b>Applications</b>.</li>
-        <li>Open FlashTransfer from Applications.</li>
-    </ol>
-    <div class="note">
-        <b>"FlashTransfer can't be opened" or "Apple could not verify..."</b><br/>
-        FlashTransfer is not yet signed with an Apple developer certificate, so macOS asks you to confirm the first time.
-        Click <b>Done</b>, open <b>System Settings &gt; Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b> next to FlashTransfer,
-        then confirm. You only need to do this once.
+<section>
+    <div class="wrap">
+        <h2>What it does</h2>
+        <ul class="does">
+            <li><b>Copies both ways</b><span>Photos, videos and documents from the phone to the Mac, and from the Mac to the phone. Drag files straight from Finder.</span></li>
+            <li><b>Never overwrites by accident</b><span>Files that already exist are skipped unless you choose to replace them, and an old file is only removed once its new copy has arrived.</span></li>
+            <li><b>Shows how long a copy takes</b><span>Select a file to see its size and an estimate before you start. While copying, you see each file and the time left.</span></li>
+            <li><b>Explains every problem</b><span>Each problem names the step it blocks, says why it happens and what to do, and comes with a log you can copy when asking for help.</span></li>
+        </ul>
     </div>
+</section>
 
-    <h2>Use it</h2>
-    <h3>1. Connect your phone</h3>
-    <ol>
-        <li>Plug the phone into your Mac with a USB cable. Some cables only charge; use one that came with a phone if you can.</li>
-        <li>Unlock the phone.</li>
-        <li>On the phone, pull down the notifications, tap the <b>USB</b> notification and choose <b>File transfer</b>.
-            If you don't see these options, unplug the cable and plug it back in.</li>
-        <li>If the phone asks <b>Allow access to phone data?</b>, tap <b>Allow</b>.</li>
-    </ol>
-    <p>FlashTransfer finds the phone by itself. The bar at the bottom of the window shows what it is doing at every step.</p>
+<section class="shots-section" id="screens">
+    <div class="wrap">
+        <div class="shots">
+            <!-- a missing screenshot removes itself; the section hides when both are missing -->
+            <figure><img src="screenshots/connect.png" alt="FlashTransfer showing each connection step, with macOS Image Capture blocking step 2" loading="lazy" onerror="this.closest('figure').remove()"/>
+                <figcaption>A blocked step says why, right next to it, with the button that fixes it.</figcaption></figure>
+            <figure><img src="screenshots/browse.png" alt="FlashTransfer browsing the phone's files with the details panel open" loading="lazy" onerror="this.closest('figure').remove()"/>
+                <figcaption>Browse the phone, copy either way, and check how long a copy will take.</figcaption></figure>
+        </div>
+    </div>
+</section>
 
-    <h3>2. "macOS Image Capture is using the phone"</h3>
-    <p>When a phone is plugged in, macOS starts a background service so Photos and Image Capture can import pictures. That service
-        locks the phone, so no other app can reach it. FlashTransfer explains this and only stops the service when you click
-        <b>Stop Image Capture and Connect</b>. It starts the service again as soon as FlashTransfer lets go of the phone,
-        so Photos keeps working. Nothing is uninstalled or changed permanently.</p>
+<section id="install">
+    <div class="wrap col">
+        <h2>Install</h2>
+        <ol class="seq">
+            <li>Download <b>FlashTransfer.dmg</b> with the button above, or from the <a href="https://github.com/AshminJayson/FlashTransfer/releases/latest">releases page</a>.</li>
+            <li>Open the downloaded file and drag <b>FlashTransfer</b> into <b>Applications</b>.</li>
+            <li>Open FlashTransfer from Applications.</li>
+        </ol>
+        <div class="caution">
+            <b>If macOS says it can't verify FlashTransfer</b>
+            FlashTransfer isn't signed with an Apple developer certificate yet, so macOS asks you to confirm the first time.
+            Click <b>Done</b>, open <b>System Settings</b>, go to <b>Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b>
+            next to FlashTransfer, then confirm. You only do this once.
+        </div>
+    </div>
+</section>
 
-    <h3>3. Copy files</h3>
-    <ul>
-        <li><b>To your Mac:</b> select files or folders, click <b>Copy to Mac</b>, and choose where to save them.</li>
-        <li><b>To your phone:</b> open the folder you want on the phone, then click <b>Copy to Phone</b> or drag files from Finder onto the window.</li>
-        <li>Select several items with <b>Cmd</b>-click or <b>Shift</b>-click, or all of them with <b>Cmd+A</b>. Double-click a folder to open it.</li>
-        <li>Select a file to see its size, date and an estimate of how long it takes to copy.</li>
-    </ul>
+<section id="connect">
+    <div class="wrap col">
+        <h2>Connect your phone</h2>
+        <p class="intro">FlashTransfer works through these four steps and shows them on screen as it goes.</p>
+        <ol class="seq stages">
+            <li><b>Phone plugged in.</b> Connect the phone with a cable that carries data; some cables only charge.
+                Unlock the phone, open its <b>USB</b> notification and choose <b>File transfer</b>.
+                <div class="stage-note">No USB options on the phone? Unplug the cable and plug it back in.</div></li>
+            <li><b>Phone free for FlashTransfer.</b> When a phone is plugged in, macOS starts Image Capture so Photos can import
+                pictures, and that locks the phone for every other app. FlashTransfer asks before pausing it: click
+                <b>Stop Image Capture and Connect</b>. Image Capture gets the phone back when you disconnect.</li>
+            <li><b>Connection opened.</b> FlashTransfer starts talking to the phone. This takes a second or two.</li>
+            <li><b>Phone sharing its files.</b> The phone only shares its files while it's unlocked, with its USB mode on
+                <b>File transfer</b> rather than <b>Charging only</b>. If it asks <b>Allow access to phone data?</b>, tap <b>Allow</b>.
+                <div class="stage-note">You can change the USB mode while FlashTransfer waits. It reconnects by itself.</div></li>
+        </ol>
+    </div>
+</section>
 
-    <h3>4. Disconnect</h3>
-    <p>Click <b>Disconnect</b> before unplugging. FlashTransfer releases the phone and hands it back to Photos and Image Capture.</p>
+<section id="use">
+    <div class="wrap col">
+        <h2>Copy files</h2>
+        <ul class="ways">
+            <li><b>To your Mac:</b> select files or folders, click <b>Copy to Mac</b>, and choose where to save them.</li>
+            <li><b>To your phone:</b> open the folder you want on the phone, then click <b>Copy to Phone</b>, or drag files from Finder onto the window.</li>
+            <li>Select several items with <b>Command</b>-click or <b>Shift</b>-click, and everything with <b>Command-A</b>. Double-click a folder to open it.</li>
+            <li>Click <b>Disconnect</b> before you unplug. Photos and Image Capture get the phone back a few seconds later.</li>
+        </ul>
+    </div>
+</section>
 
-    <h2 id="help">Troubleshooting</h2>
-    <p>Every problem shows a code. Find it below. If you need help, click <b>Show Log</b> at the bottom of the window,
-        then <b>Copy Log</b>, and paste it into a <a data-gh="issues" href="#">new issue</a>.</p>
+<section id="help">
+    <div class="wrap col">
+        <h2>When something goes wrong</h2>
+        <p class="intro">Every problem shows a code. Find it under the step it blocks. If you need help, click <b>Show Log</b> at the
+            bottom of the window, then <b>Copy Log</b>, and paste it into a <a href="https://github.com/AshminJayson/FlashTransfer/issues/new">new issue</a>.</p>
 
-    <details><summary><span class="code">MTP-001</span>No phone found</summary>
-        <p>Use a data cable, not a charge-only one. Unlock the phone and choose <b>File transfer</b> in its USB notification.
-            If the options don't appear, unplug and plug the cable back in. Try another USB port.</p></details>
-    <details><summary><span class="code">MTP-002</span>macOS Image Capture is using the phone</summary>
-        <p>Click <b>Stop Image Capture and Connect</b>. See <i>Use it, step 2</i> above for what this does.</p></details>
-    <details><summary><span class="code">MTP-003</span>Another app is using the phone</summary>
-        <p>Only one app can use the phone at a time. Quit the app named in the message, for example OpenMTP or Android File Transfer.</p></details>
-    <details><summary><span class="code">MTP-004</span>Could not open a connection to the phone</summary>
-        <p>FlashTransfer already retries by itself. Unlock the phone and keep the screen on. If it still fails, unplug the phone,
-            wait 5 seconds and plug it back in. Restart the phone if it keeps happening.</p></details>
-    <details><summary><span class="code">MTP-005</span>Phone storage is not visible</summary>
-        <p>Android hides its files until the phone is unlocked and you allow access. Unlock the phone and tap <b>Allow</b> if asked.</p></details>
-    <details><summary><span class="code">MTP-006</span>File or folder not found on the phone</summary>
-        <p>The item was moved or deleted on the phone. Click the refresh button to reload the folder.</p></details>
-    <details><summary><span class="code">MTP-007</span>Files skipped because they already exist</summary>
-        <p>Nothing was overwritten. Click <b>Replace Them</b> if you do want the new copies.</p></details>
-    <details><summary><span class="code">MTP-008</span>Phone storage is full</summary>
-        <p>Free up space on the phone, then copy again.</p></details>
-    <details><summary><span class="code">MTP-009</span>The transfer stopped</summary>
-        <p>The phone stopped responding, for example because the cable moved, the USB mode changed, or the phone locked.
-            Unlock the phone, check the cable and copy again. Finished files are kept; the interrupted one is not left half-written.</p></details>
-    <details><summary><span class="code">MTP-010</span>macOS Image Capture could not be restarted</summary>
-        <p>Photos and Image Capture may not see phones until the service runs again. Unplug the phone and plug it back in.
-            If Photos still can't see it, restart the Mac.</p></details>
+        <div class="group">
+            <h3><i></i>Step 1: phone plugged in</h3>
+            <details><summary><span class="code">MTP-001</span><span class="what">No phone found</span></summary>
+                <p>Use a cable that carries data. Unlock the phone and choose <b>File transfer</b> in its USB notification. If those options don't
+                    appear, unplug the cable and plug it back in. Then try another USB port.</p></details>
+        </div>
 
-    <h2>Privacy</h2>
-    <p>FlashTransfer works entirely offline. It has no accounts, no analytics and no network access; your files only move
-        between your phone and your Mac.</p>
-</main>
+        <div class="group">
+            <h3><i></i>Step 2: phone free for FlashTransfer</h3>
+            <details><summary><span class="code">MTP-002</span><span class="what">macOS Image Capture is using the phone</span></summary>
+                <p>Click <b>Stop Image Capture and Connect</b>. FlashTransfer pauses Image Capture only while it uses the phone.</p></details>
+            <details><summary><span class="code">MTP-003</span><span class="what">Another app is using the phone</span></summary>
+                <p>Only one app can use the phone at a time. Quit the app named in the message, such as OpenMTP or Android File Transfer.</p></details>
+            <details><summary><span class="code">MTP-010</span><span class="what">Image Capture couldn't be restarted</span></summary>
+                <p>Photos and Image Capture may not see phones until it runs again. Unplug the phone and plug it back in. If Photos still
+                    can't see it, restart the Mac.</p></details>
+        </div>
+
+        <div class="group">
+            <h3><i></i>Step 3: connection opened</h3>
+            <details><summary><span class="code">MTP-004</span><span class="what">Couldn't open a connection to the phone</span></summary>
+                <p>FlashTransfer already retries by itself. Unlock the phone and keep the screen on. If it still fails, unplug the phone,
+                    wait five seconds and plug it back in. Restart the phone if it keeps happening.</p></details>
+        </div>
+
+        <div class="group">
+            <h3><i></i>Step 4: phone sharing its files</h3>
+            <details><summary><span class="code">MTP-005</span><span class="what">Phone isn't sharing its files</span></summary>
+                <p>The phone is locked, hasn't been allowed access, or its USB mode is <b>Charging only</b>. Unlock it, choose
+                    <b>File transfer</b> in its USB notification, and tap <b>Allow</b> if asked.</p></details>
+        </div>
+
+        <div class="group after">
+            <h3><i></i>While copying</h3>
+            <details><summary><span class="code">MTP-006</span><span class="what">File or folder not found on the phone</span></summary>
+                <p>It was moved or deleted on the phone. Click the refresh button to reload the folder.</p></details>
+            <details><summary><span class="code">MTP-007</span><span class="what">Files skipped because they already exist</span></summary>
+                <p>Nothing was overwritten. Click <b>Replace Them</b> if you do want the new copies.</p></details>
+            <details><summary><span class="code">MTP-008</span><span class="what">Phone storage is full</span></summary>
+                <p>Free up space on the phone, then copy again.</p></details>
+            <details><summary><span class="code">MTP-009</span><span class="what">The copy stopped</span></summary>
+                <p>The phone stopped answering, for example because the cable moved, the USB mode changed or the phone locked.
+                    Check the cable, unlock the phone and copy again. Finished files are kept, and the interrupted one isn't left half-written.</p></details>
+        </div>
+    </div>
+</section>
+
+<section id="privacy">
+    <div class="wrap col">
+        <h2>Your files stay yours</h2>
+        <p>FlashTransfer has no account, no analytics and no network access. Files only move along the cable between your phone and your Mac.</p>
+    </div>
+</section>
+
 <footer>
-    FlashTransfer is free and open source under the MIT License. <a data-gh="repo" href="#">Source code</a> &middot;
-    <a data-gh="issues" href="#">Report a problem</a>
+    <div class="wrap">
+        FlashTransfer is free and open source under the MIT License.
+        Read the <a href="https://github.com/AshminJayson/FlashTransfer">source code</a> or
+        <a href="https://github.com/AshminJayson/FlashTransfer/issues/new">report a problem</a>.
+    </div>
 </footer>
+
 <script>
-    // Project pages live at https://<owner>.github.io/<repo>/, so the GitHub links can be derived
-    // from the page address instead of being hard-coded.
+    // Dark mode toggle; the choice is remembered on this device.
     (function () {
-        var host = location.hostname, repo = location.pathname.split("/")[1];
-        if (!/\.github\.io$/.test(host) || !repo) return;
-        var base = "https://github.com/" + host.split(".")[0] + "/" + repo;
-        var targets = { repo: base, releases: base + "/releases/latest", issues: base + "/issues/new" };
-        document.querySelectorAll("[data-gh]").forEach(function (a) { a.href = targets[a.dataset.gh]; });
+        var btn = document.getElementById("theme"), root = document.documentElement;
+        function render() {
+            var dark = root.dataset.theme === "dark";
+            btn.setAttribute("aria-pressed", String(dark));
+            btn.querySelector("span").textContent = dark ? "Light mode" : "Dark mode";
+            btn.querySelector("svg").innerHTML = dark
+                ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
+                : '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+        }
+        btn.addEventListener("click", function () {
+            var dark = root.dataset.theme !== "dark";
+            if (dark) { root.dataset.theme = "dark"; } else { delete root.dataset.theme; }
+            try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch (e) {}
+            render();
+        });
+        render();
+    })();
+
+    // Hide the screenshots section until at least one screenshot exists.
+    (function () {
+        var section = document.getElementById("screens");
+        var imgs = section.querySelectorAll("img"), pending = imgs.length;
+        section.hidden = true;
+        imgs.forEach(function (img) {
+            var done = function () { if (--pending === 0 && section.querySelector("figure")) section.hidden = false; };
+            if (img.complete && img.naturalWidth) { done(); } else { img.addEventListener("load", done); img.addEventListener("error", done); }
+        });
+    })();
+
+    // Play the connection once: the moment FlashTransfer exists for.
+    (function () {
+        var steps = Array.prototype.slice.call(document.querySelectorAll("#demo li"));
+        var foot = document.getElementById("demo-foot"), clock = document.getElementById("clock");
+        function set(i, state, note) {
+            steps[i].className = state;
+            steps[i].querySelector(".step-note").textContent = note || "";
+        }
+        function finish() {
+            steps.forEach(function (li, i) { set(i, "done", li.dataset.note); });
+            foot.innerHTML = "<b>Connected.</b> Ready to copy files.";
+            clock.textContent = "1.2 s";
+        }
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { finish(); return; }
+        var script = [
+            [0, function () { set(0, "working", "Looking for your phone"); foot.textContent = "Plug in your phone"; }],
+            [900, function () { set(0, "done", steps[0].dataset.note); set(1, "blocked", "macOS Image Capture is using the phone"); foot.textContent = "You click Stop Image Capture and Connect"; }],
+            [2600, function () { set(1, "working", "Pausing Image Capture"); }],
+            [3300, function () { set(1, "done", steps[1].dataset.note); set(2, "working", "Opening the phone"); }],
+            [4000, function () { set(2, "done", steps[2].dataset.note); set(3, "working", "Reading the phone's storage"); }],
+            [4700, finish]
+        ];
+        var start = performance.now();
+        script.forEach(function (s) { setTimeout(s[1], s[0]); });
+        var tick = setInterval(function () {
+            var t = (performance.now() - start) / 1000;
+            if (t > 4.7) { clearInterval(tick); return; }
+            clock.textContent = t.toFixed(1) + " s";
+        }, 100);
     })();
 </script>
 </body>

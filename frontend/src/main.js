@@ -29,11 +29,23 @@ const current = () => state.path[state.path.length - 1];
 
 // --- connect screen ---
 
+// stickyIssue keeps the reason a requested connect failed on screen; otherwise the next
+// check would replace it with "Image Capture is using the phone" once it takes the phone back
+let stickyIssue = null;
+
 async function tryConnect(stopImageCapture = false) {
     clearTimeout(connectTimer);
     const r = await PhoneService.Connect(stopImageCapture);
     if (r.Model) {
+        stickyIssue = null;
         enterBrowser(r);
+        return;
+    }
+    if (!r.Present) stickyIssue = null;
+    if (stopImageCapture && r.Issue) stickyIssue = r.Issue;
+    if (stickyIssue && r.Present && r.Issue && r.Issue.Code === "MTP-002") {
+        showConnect(stickyIssue, true);
+        connectTimer = setTimeout(() => tryConnect(false), 4000);
         return;
     }
     const issue = r.HandingBack ? {

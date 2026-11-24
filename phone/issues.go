@@ -87,10 +87,12 @@ func Locked(err error) *Issue {
 	return &Issue{
 		Code:  "MTP-005",
 		Step:  StepFiles,
-		Title: "Phone storage is not visible",
-		Why:   "Android hides its files until the phone is unlocked and you allow access.",
+		Title: "Phone isn't sharing its files",
+		Why: "Android shares no files while the phone is locked, until you allow access, or while its USB mode is " +
+			"Charging only. Over USB these look the same, so FlashTransfer can't tell which one it is.",
 		Fix: []string{
 			"Unlock the phone.",
+			"Open the USB notification on the phone and choose \"File transfer\", not \"Charging only\".",
 			"If the phone asks \"Allow access to phone data?\", tap Allow.",
 		},
 		Err: err,
