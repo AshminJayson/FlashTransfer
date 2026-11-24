@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>FlashTransfer: copy files between your Mac and Android phone</title>
+    <link rel="icon" type="image/svg+xml" href="icon.svg"/>
+    <meta name="description" content="Free, open-source Mac app to copy photos, videos and files between your Mac and an Android phone over USB."/>
+    <style>
+        :root {
+            --bg: #ffffff; --bg-soft: #f5f5f7; --fg: #1d1d1f; --dim: #6e6e73; --line: #e5e5ea;
+            --accent: #0a84ff; --warn-bg: #fff8e6; --warn-line: #f5d78e;
+            color-scheme: light dark;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #1c1c1e; --bg-soft: #2a2a2c; --fg: #f5f5f7; --dim: #98989d; --line: #3a3a3c; --warn-bg: #3a3120; --warn-line: #6b5520; }
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; }
+        main { max-width: 760px; margin: 0 auto; padding: 0 22px 60px; }
+        header.hero { text-align: center; padding: 64px 0 36px; }
+        .app-icon { width: 112px; height: 112px; }
+        h1 { font-size: 44px; line-height: 1.1; margin: 12px 0 10px; letter-spacing: -0.02em; }
+        .tagline { font-size: 20px; color: var(--dim); margin: 0 0 28px; }
+        .download { display: inline-block; background: var(--accent); color: #fff; text-decoration: none; font-weight: 600; padding: 12px 26px; border-radius: 10px; font-size: 17px; }
+        .download:hover { filter: brightness(1.08); }
+        .meta { color: var(--dim); font-size: 14px; margin-top: 12px; }
+        h2 { font-size: 26px; margin: 52px 0 12px; letter-spacing: -0.01em; }
+        h3 { font-size: 18px; margin: 24px 0 6px; }
+        a { color: var(--accent); }
+        ol, ul { padding-left: 22px; }
+        li { margin: 6px 0; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: 18px; }
+        .feature { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+        .feature b { display: block; margin-bottom: 4px; }
+        .feature p { margin: 0; color: var(--dim); font-size: 15px; }
+        .shots { display: grid; gap: 22px; margin-top: 36px; }
+        .shots figure { margin: 0; }
+        .shots img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18); }
+        .shots figcaption { color: var(--dim); font-size: 14px; text-align: center; margin-top: 8px; }
+        .note { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 12px; padding: 14px 18px; margin: 16px 0; }
+        code { font: 14px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg-soft); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; }
+        details { border-bottom: 1px solid var(--line); padding: 10px 0; }
+        summary { cursor: pointer; font-weight: 600; }
+        summary .code { color: var(--dim); font-weight: normal; font: 14px ui-monospace, SFMono-Regular, Menlo, monospace; margin-right: 8px; }
+        details p { margin: 8px 0 4px; }
+        footer { color: var(--dim); font-size: 14px; text-align: center; border-top: 1px solid var(--line); padding: 24px 22px 40px; }
+    </style>
+</head>
+<body>
+<main>
+    <header class="hero">
+        <img class="app-icon" src="icon.svg" width="112" height="112" alt="FlashTransfer icon"/>
+        <h1>FlashTransfer</h1>
+        <p class="tagline">Copy photos, videos and files between your Mac and your Android phone. Just a USB cable, no accounts, no internet.</p>
+        <a class="download" data-gh="releases" href="#install">Download for Mac</a>
+        <p class="meta">Free and open source &middot; macOS 13 or later &middot; Apple Silicon and Intel</p>
+    </header>
+
+    <section class="features" aria-label="Features">
+        <div class="feature"><b>Both directions</b><p>Copy from the phone to the Mac and from the Mac to the phone. Drag files straight from Finder.</p></div>
+        <div class="feature"><b>Nothing overwritten by accident</b><p>Existing files are skipped unless you choose to replace them, and a replaced file is only removed once the new copy has arrived.</p></div>
+        <div class="feature"><b>Clear progress</b><p>See each file, the percentage, and roughly how long the copy has left. File details show an estimate before you start.</p></div>
+        <div class="feature"><b>Tells you what's wrong</b><p>Every problem comes with a plain explanation, steps to fix it, and a log you can copy when asking for help.</p></div>
+    </section>
+
+    <section class="shots" aria-label="Screenshots">
+        <!-- a missing screenshot removes itself instead of showing a broken image -->
+        <figure><img src="screenshots/connect.png" alt="FlashTransfer showing each connection step, with macOS Image Capture blocking step 2" loading="lazy" onerror="this.closest('figure').remove()"/>
+            <figcaption>Every connection step is visible, and a blocked step says why and what to do.</figcaption></figure>
+        <figure><img src="screenshots/browse.png" alt="FlashTransfer browsing the phone's files with the details panel open" loading="lazy" onerror="this.closest('figure').remove()"/>
+            <figcaption>Browse the phone, copy either way, and see how long a copy will take.</figcaption></figure>
+    </section>
+
+    <h2 id="install">Install</h2>
+    <ol>
+        <li>Download the latest <b>FlashTransfer.dmg</b> from the <a data-gh="releases" href="#">releases page</a>.</li>
+        <li>Open it and drag <b>FlashTransfer</b> into <b>Applications</b>.</li>
+        <li>Open FlashTransfer from Applications.</li>
+    </ol>
+    <div class="note">
+        <b>"FlashTransfer can't be opened" or "Apple could not verify..."</b><br/>
+        FlashTransfer is not yet signed with an Apple developer certificate, so macOS asks you to confirm the first time.
+        Click <b>Done</b>, open <b>System Settings &gt; Privacy &amp; Security</b>, scroll down and click <b>Open Anyway</b> next to FlashTransfer,
+        then confirm. You only need to do this once.
+    </div>
+
+    <h2>Use it</h2>
+    <h3>1. Connect your phone</h3>
+    <ol>
+        <li>Plug the phone into your Mac with a USB cable. Some cables only charge; use one that came with a phone if you can.</li>
+        <li>Unlock the phone.</li>
+        <li>On the phone, pull down the notifications, tap the <b>USB</b> notification and choose <b>File transfer</b>.
+            If you don't see these options, unplug the cable and plug it back in.</li>
+        <li>If the phone asks <b>Allow access to phone data?</b>, tap <b>Allow</b>.</li>
+    </ol>
+    <p>FlashTransfer finds the phone by itself. The bar at the bottom of the window shows what it is doing at every step.</p>
+
+    <h3>2. "macOS Image Capture is using the phone"</h3>
+    <p>When a phone is plugged in, macOS starts a background service so Photos and Image Capture can import pictures. That service
+        locks the phone, so no other app can reach it. FlashTransfer explains this and only stops the service when you click
+        <b>Stop Image Capture and Connect</b>. It starts the service again as soon as FlashTransfer lets go of the phone,
+        so Photos keeps working. Nothing is uninstalled or changed permanently.</p>
+
+    <h3>3. Copy files</h3>
+    <ul>
+        <li><b>To your Mac:</b> select files or folders, click <b>Copy to Mac</b>, and choose where to save them.</li>
+        <li><b>To your phone:</b> open the folder you want on the phone, then click <b>Copy to Phone</b> or drag files from Finder onto the window.</li>
+        <li>Select several items with <b>Cmd</b>-click or <b>Shift</b>-click, or all of them with <b>Cmd+A</b>. Double-click a folder to open it.</li>
+        <li>Select a file to see its size, date and an estimate of how long it takes to copy.</li>
+    </ul>
+
+    <h3>4. Disconnect</h3>
+    <p>Click <b>Disconnect</b> before unplugging. FlashTransfer releases the phone and hands it back to Photos and Image Capture.</p>
+
+    <h2 id="help">Troubleshooting</h2>
+    <p>Every problem shows a code. Find it below. If you need help, click <b>Show Log</b> at the bottom of the window,
+        then <b>Copy Log</b>, and paste it into a <a data-gh="issues" href="#">new issue</a>.</p>
+
+    <details><summary><span class="code">MTP-001</span>No phone found</summary>
+        <p>Use a data cable, not a charge-only one. Unlock the phone and choose <b>File transfer</b> in its USB notification.
+            If the options don't appear, unplug and plug the cable back in. Try another USB port.</p></details>
+    <details><summary><span class="code">MTP-002</span>macOS Image Capture is using the phone</summary>
+        <p>Click <b>Stop Image Capture and Connect</b>. See <i>Use it, step 2</i> above for what this does.</p></details>
+    <details><summary><span class="code">MTP-003</span>Another app is using the phone</summary>
+        <p>Only one app can use the phone at a time. Quit the app named in the message, for example OpenMTP or Android File Transfer.</p></details>
+    <details><summary><span class="code">MTP-004</span>Could not open a connection to the phone</summary>
+        <p>FlashTransfer already retries by itself. Unlock the phone and keep the screen on. If it still fails, unplug the phone,
+            wait 5 seconds and plug it back in. Restart the phone if it keeps happening.</p></details>
+    <details><summary><span class="code">MTP-005</span>Phone storage is not visible</summary>
+        <p>Android hides its files until the phone is unlocked and you allow access. Unlock the phone and tap <b>Allow</b> if asked.</p></details>
+    <details><summary><span class="code">MTP-006</span>File or folder not found on the phone</summary>
+        <p>The item was moved or deleted on the phone. Click the refresh button to reload the folder.</p></details>
+    <details><summary><span class="code">MTP-007</span>Files skipped because they already exist</summary>
+        <p>Nothing was overwritten. Click <b>Replace Them</b> if you do want the new copies.</p></details>
+    <details><summary><span class="code">MTP-008</span>Phone storage is full</summary>
+        <p>Free up space on the phone, then copy again.</p></details>
+    <details><summary><span class="code">MTP-009</span>The transfer stopped</summary>
+        <p>The phone stopped responding, for example because the cable moved, the USB mode changed, or the phone locked.
+            Unlock the phone, check the cable and copy again. Finished files are kept; the interrupted one is not left half-written.</p></details>
+    <details><summary><span class="code">MTP-010</span>macOS Image Capture could not be restarted</summary>
+        <p>Photos and Image Capture may not see phones until the service runs again. Unplug the phone and plug it back in.
+            If Photos still can't see it, restart the Mac.</p></details>
+
+    <h2>Privacy</h2>
+    <p>FlashTransfer works entirely offline. It has no accounts, no analytics and no network access; your files only move
+        between your phone and your Mac.</p>
+</main>
+<footer>
+    FlashTransfer is free and open source under the MIT License. <a data-gh="repo" href="#">Source code</a> &middot;
+    <a data-gh="issues" href="#">Report a problem</a>
+</footer>
+<script>
+    // Project pages live at https://<owner>.github.io/<repo>/, so the GitHub links can be derived
+    // from the page address instead of being hard-coded.
+    (function () {
+        var host = location.hostname, repo = location.pathname.split("/")[1];
+        if (!/\.github\.io$/.test(host) || !repo) return;
+        var base = "https://github.com/" + host.split(".")[0] + "/" + repo;
+        var targets = { repo: base, releases: base + "/releases/latest", issues: base + "/issues/new" };
+        document.querySelectorAll("[data-gh]").forEach(function (a) { a.href = targets[a.dataset.gh]; });
+    })();
+</script>
+</body>
+</html>
