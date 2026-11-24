@@ -10,9 +10,6 @@
         // apply a saved dark-mode choice before the page paints
         try { if (localStorage.getItem("theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch (e) {}
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com"/>
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&display=swap"/>
     <style>
         :root {
             --black: #000000;
@@ -27,8 +24,9 @@
             --working: #1d5fd6;
             --button-bg: #000000;
             --button-fg: #ffffff;
-            --display: "Bricolage Grotesque", "Avenir Next Condensed", "Helvetica Neue", sans-serif;
-            --text: "Atkinson Hyperlegible", -apple-system, "Helvetica Neue", Arial, sans-serif;
+            /* Apple's system font (SF Pro): looks native on a Mac and needs no web font */
+            --display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+            --text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
             color-scheme: light;
         }
         /* dark mode is opt-in from the header toggle */
@@ -51,7 +49,7 @@
         html { -webkit-text-size-adjust: 100%; }
         body {
             margin: 0; background: var(--paper); color: var(--ink);
-            font: 18px/1.6 var(--text);
+            font: 18px/1.55 var(--text); -webkit-font-smoothing: antialiased;
         }
         a { color: var(--working); text-underline-offset: 3px; }
         a:focus-visible, summary:focus-visible, .download:focus-visible {
@@ -77,10 +75,10 @@
         .theme:focus-visible { outline: 3px solid var(--working); outline-offset: 3px; }
         .theme svg { width: 16px; height: 16px; }
         .brand img { width: 56px; height: 56px; }
-        .brand span { font: 700 22px/1 var(--display); font-stretch: 90%; letter-spacing: -0.01em; }
+        .brand span { font: 700 22px/1 var(--display); letter-spacing: -0.01em; }
         h1 {
-            font-family: var(--display); font-weight: 800; font-stretch: 75%;
-            font-size: clamp(48px, 7vw, 92px); line-height: 0.92; letter-spacing: -0.025em;
+            font-family: var(--display); font-weight: 700;
+            font-size: clamp(42px, 5.6vw, 72px); line-height: 1.02; letter-spacing: -0.035em;
             margin: 0 0 24px;
         }
         .lede { font-size: 21px; line-height: 1.5; color: var(--muted); max-width: 30em; margin: 0 0 32px; }
@@ -100,7 +98,7 @@
         }
         html[data-theme="dark"] .live { border: 1px solid #2a2f37; box-shadow: none; }
         .live-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 26px; }
-        .live-head b { font: 700 20px/1.2 var(--display); font-stretch: 85%; }
+        .live-head b { font: 700 20px/1.2 var(--display); }
         .live-head span { color: #9aa3b0; font-size: 14px; }
         .steps { list-style: none; margin: 0; padding: 0; }
         .steps li { display: grid; grid-template-columns: 30px 1fr; gap: 16px; position: relative; padding-bottom: 22px; }
@@ -119,10 +117,10 @@
         .steps li.working .dot { border-color: #2c3440; border-top-color: #6d9cff; animation: spin 0.8s linear infinite; font-size: 0; }
         .steps li.blocked .dot { background: #f0a53a; border-color: #f0a53a; color: #000; }
         .steps li.blocked .step-note { color: #f6c27a; }
-        .steps li.done .dot { background: #3cc27a; border-color: #3cc27a; font-size: 0; }
-        .steps li.done .dot::after {
-            content: ""; width: 7px; height: 12px; border: solid #000; border-width: 0 2.5px 2.5px 0;
-            transform: translateY(-1px) rotate(45deg);
+        /* checkmark drawn on a 24px grid and centred, so it sits in the optical middle */
+        .steps li.done .dot {
+            background: #3cc27a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpolyline points='5.5 12.5 10 17 18.5 7.5' fill='none' stroke='%23000' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 18px 18px no-repeat;
+            border-color: #3cc27a; font-size: 0;
         }
         .steps li.done:not(:last-child)::before { background: #3cc27a; }
         .live-foot { margin-top: 26px; padding-top: 18px; border-top: 1px solid #2c3440; color: #9aa3b0; font-size: 15px; }
@@ -132,15 +130,15 @@
         /* --- sections --- */
         section { padding: 64px 0; border-top: 1px solid var(--line); }
         h2 {
-            font-family: var(--display); font-weight: 800; font-stretch: 80%;
-            font-size: clamp(34px, 4.4vw, 48px); line-height: 1; letter-spacing: -0.02em; margin: 0 0 18px;
+            font-family: var(--display); font-weight: 700;
+            font-size: clamp(30px, 3.6vw, 40px); line-height: 1.1; letter-spacing: -0.025em; margin: 0 0 18px;
         }
         h3 { font: 700 21px/1.3 var(--text); margin: 34px 0 8px; }
         p { margin: 0 0 16px; }
         .intro { color: var(--muted); font-size: 20px; margin-bottom: 28px; }
 
         .does { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 26px 48px; max-width: 920px; }
-        .does b { display: block; font: 700 21px/1.25 var(--display); font-stretch: 88%; margin-bottom: 4px; }
+        .does b { display: block; font: 700 21px/1.25 var(--display); margin-bottom: 4px; }
         .does span { color: var(--muted); }
 
         .shots { display: grid; gap: 28px; margin-top: 8px; }
