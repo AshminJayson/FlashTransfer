@@ -74,7 +74,10 @@
         .theme:hover { background: var(--surface); }
         .theme:focus-visible { outline: 3px solid var(--working); outline-offset: 3px; }
         .theme svg { width: 16px; height: 16px; }
-        .top-actions { display: flex; align-items: center; gap: 10px; }
+        .top-actions { display: flex; align-items: center; gap: 10px; flex: none; }
+        .theme, .gh { flex: none; white-space: nowrap; }
+        /* grid children may shrink below their content width instead of widening the page */
+        .hero > * { min-width: 0; }
         .gh {
             display: inline-grid; place-items: center; width: 36px; height: 36px;
             border: 1px solid var(--line); border-radius: 50%; color: var(--ink);
@@ -199,6 +202,22 @@
             summary { grid-template-columns: 78px 1fr 20px; }
             details p { margin-left: 0; }
             .live { padding: 26px 22px; }
+        }
+        @media (max-width: 560px) {
+            .wrap { padding: 0 20px; }
+            .brand { gap: 10px; }
+            .brand img { width: 40px; height: 40px; }
+            .brand span { font-size: 19px; }
+            /* icon-only toggle; the label stays readable for screen readers */
+            .theme { width: 36px; height: 36px; padding: 0; justify-content: center; border-radius: 50%; }
+            .theme span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+            .lede { font-size: 19px; }
+            .download { width: 100%; justify-content: center; }
+            .steps li { grid-template-columns: 30px 1fr; gap: 12px; }
+            .live-head { flex-wrap: wrap; gap: 4px 12px; }
+            /* code on its own line so the problem title gets the full width */
+            summary { grid-template-columns: 1fr 20px; row-gap: 2px; }
+            summary .code { grid-column: 1 / -1; }
         }
         @media (prefers-reduced-motion: reduce) {
             .steps li.working .dot { animation: none; }
