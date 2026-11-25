@@ -101,6 +101,8 @@
         .download svg { width: 18px; height: 18px; }
         .download:hover { opacity: 0.85; }
         .fine { color: var(--muted); font-size: 15px; margin: 14px 0 0; }
+        .ph { margin: 24px 0 0; }
+        .ph img { display: block; }
 
         /* the live connection: the one moving thing on the page */
         .live {
@@ -249,6 +251,7 @@
                 Download for Mac
             </a>
             <p class="fine">Free and open source. Needs macOS 13 or later, on Apple Silicon or Intel.</p>
+            <p class="ph"><a href="https://www.producthunt.com/products/flashtransfer?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-flashtransfer" target="_blank" rel="noopener noreferrer"><img id="ph-badge" alt="FlashTransfer - Android file transfer for Mac that tells you what's wrong | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1329731&amp;theme=light&amp;t=1795586357331"></a></p>
         </div>
 
         <!-- replays the app's connection flow once on load -->
@@ -416,6 +419,8 @@
             btn.querySelector("svg").innerHTML = dark
                 ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'
                 : '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+            var ph = document.getElementById("ph-badge");
+            ph.src = ph.src.replace(/theme=(light|dark)/, "theme=" + (dark ? "dark" : "light"));
         }
         btn.addEventListener("click", function () {
             var dark = root.dataset.theme !== "dark";

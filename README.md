@@ -2,6 +2,8 @@
 
 Copy files between a Mac and an Android phone over USB.
 
+<a href="https://www.producthunt.com/products/flashtransfer?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-flashtransfer" target="_blank" rel="noopener noreferrer"><img alt="FlashTransfer - Android file transfer for Mac that tells you what's wrong | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1329731&amp;theme=dark&amp;t=1795586357331"></a>
+
 ## Installation
 
 You need a Mac with macOS 13 or later (Apple Silicon or Intel), an Android phone, and a USB
